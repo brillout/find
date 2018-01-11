@@ -1,13 +1,14 @@
 {
   "name": "@brillout/find",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": "github:brillout/find",
-  "main": "./Find.js",
+  "main": "./find.js",
   "dependencies": {
     "find-up": "^2.1.0",
     "glob": "^7.1.2",
     "glob-gitignore": "^1.0.6",
     "ignore": "^3.3.7",
-    "path-is-inside": "^1.0.2"
+    "path-is-inside": "^1.0.2",
+    "reassert": "^1.0.5"
   }
 }
