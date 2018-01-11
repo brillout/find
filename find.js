@@ -99,27 +99,27 @@ function find_project_root({cwd, anchor_file}) {
     assert_internal(cwd);
 
     const file_at_root = (() => {
-        const dot_projectName_path = !anchor_file ? null : find_up(anchor_file, {cwd});
-        assert_internal(dot_projectName_path===null || dot_projectName_path.constructor===String);
-        if( dot_projectName_path ) {
-            return dot_projectName_path;
+        const anchor_path = !anchor_file ? null : find_up(anchor_file, {cwd});
+        assert_internal(anchor_path===null || anchor_path.startsWith('/'));
+        if( anchor_path ) {
+            return anchor_path;
         }
 
         const dot_git_path = find_up('.git', {cwd});
-        assert_internal(dot_git_path===null || dot_git_path.constructor===String);
+        assert_internal(dot_git_path===null || dot_git_path.startsWith('/'));
         if( dot_git_path ) {
             return dot_git_path;
         }
 
-        assert_usage(
-            false,
-            "Can't find any file/directory `.git` or `."+projectName+"` while traversing the file tree up to the root `/` starting from `"+cwd+"`.",
-            "Hence the project's root directory can't be determined.",
-        );
+        return null;
     })();
 
-    const project_root = path_module.resolve(file_at_root, '../');
+    assert_internal(file_at_root===null || file_at_root.startsWith('/'));
+    if( ! file_at_root ) {
+        return null;
+    }
 
+    const project_root = path_module.join(file_at_root, '../');
     return project_root;
 }
 

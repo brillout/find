@@ -10,7 +10,7 @@ console.log(find('pages', {noDir: true, canBeMissing: true}));
 */
 console.log(find('page1', {canBeMissing: true}));
 try {
-    find('page2.js');
+    console.log(find('page2.js'));
     throw new Error('I should not be.');
 } catch(err) {
     console.log(err.message);

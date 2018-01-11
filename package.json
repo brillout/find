@@ -1,6 +1,6 @@
 {
   "name": "@brillout/find",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "repository": "github:brillout/find",
   "main": "./find.js",
   "dependencies": {
@@ -9,6 +9,6 @@
     "glob-gitignore": "^1.0.6",
     "ignore": "^3.3.7",
     "path-is-inside": "^1.0.2",
-    "reassert": "^1.0.5"
+    "reassert": "^1.1.0"
   }
 }
