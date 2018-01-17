@@ -1,8 +1,11 @@
 {
   "name": "@brillout/find",
-  "version": "0.2.1",
-  "repository": "github:brillout/find",
+  "version": "0.2.2",
   "main": "./find.js",
+  "scripts": {
+    "docs": "./node_modules/.bin/mdocs",
+    "link": "./node_modules/.bin/self-import"
+  },
   "dependencies": {
     "find-up": "^2.1.0",
     "glob": "^7.1.2",
@@ -10,5 +13,10 @@
     "ignore": "^3.3.7",
     "path-is-inside": "^1.0.2",
     "reassert": "^1.1.0"
-  }
+  },
+  "devDependencies": {
+    "@brillout/mdocs": "^0.1.5",
+    "self-import": "^1.0.1"
+  },
+  "repository": "github:brillout/find"
 }

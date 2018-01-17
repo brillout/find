@@ -62,7 +62,7 @@ function find_file({filename, input, no_dir, only_dir, anchor_file, can_be_missi
     }
 
     paths_found.sort((file1, file2) => {
-        return file_depth(file1) - file_depth(file2);
+        return get_distance_with_cwd(file1, cwd) - get_distance_with_cwd(file2, cwd);
     });
 
     /*
@@ -190,7 +190,17 @@ function get_gitignore_content({cwd}) {
     return gitignore_content;
 }
 
-function file_depth(file) {
+function get_distance_with_cwd(path, cwd) {
+    assert_internal(cwd);
+    assert_internal(path_module.isAbsolute(cwd));
+    assert_internal(path);
+    assert_internal(path_module.isAbsolute(path));
+    const path__relative = path_module.relative(cwd, path);
+    const distance = path_depth(path__relative);
+    return distance;
+}
+
+function path_depth(file) {
     return (
         path_module
         .normalize(file)
