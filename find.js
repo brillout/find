@@ -31,13 +31,22 @@ function find(
 
     assert_usage(!no_dir || !only_dir);
 
-    return find_file({filename, input, no_dir, only_dir, anchor_file, can_be_missing, cwd});
+    const root_files = [
+        ...(
+            !anchor_file && [] ||
+            anchor_file.constructor===Array && anchor_file ||
+            [anchor_file]
+        ),
+        '.git',
+    ];
+
+    return find_file({filename, input, no_dir, only_dir, root_files, can_be_missing, cwd});
 }
 
-function find_file({filename, input, no_dir, only_dir, anchor_file, can_be_missing, cwd}) {
+function find_file({filename, input, no_dir, only_dir, root_files, can_be_missing, cwd}) {
     assert_internal(!filename.endsWith('/'));
 
-    const project_root = find_project_root({cwd, anchor_file});
+    const project_root = find_project_root({cwd, root_files});
 
     const path_found_up = find_up(filename, {cwd, no_dir, only_dir});
 
@@ -55,15 +64,13 @@ function find_file({filename, input, no_dir, only_dir, anchor_file, can_be_missi
     ];
     assert_internal(paths_found.every(path_found => path_found.startsWith('/')));
 
-    assert_can_be_missing({can_be_missing, paths_found, input, project_root, anchor_file});
+    assert_can_be_missing({can_be_missing, paths_found, input, project_root, root_files});
 
     if( paths_found.length===0 ) {
         return null;
     }
 
-    paths_found.sort((file1, file2) => {
-        return get_distance_with_cwd(file1, cwd) - get_distance_with_cwd(file2, cwd);
-    });
+    paths_found.sort(cwd_distance_sorter(cwd));
 
     /*
     const dir = path_module.resolve(within_directory, paths_found[0]);
@@ -75,7 +82,7 @@ function find_file({filename, input, no_dir, only_dir, anchor_file, can_be_missi
     return found;
 }
 
-function assert_can_be_missing({can_be_missing, paths_found, input, project_root, anchor_file}) {
+function assert_can_be_missing({can_be_missing, paths_found, input, project_root, root_files}) {
     assert_usage(
         can_be_missing || paths_found.length>0,
         ...(
@@ -85,8 +92,8 @@ function assert_can_be_missing({can_be_missing, paths_found, input, project_root
                 ! project_root && "Could not find project root.",
                 ! project_root && (
                     [
-                        "Project root is determined by searching for `.git`",
-                        anchor_file && " and `"+anchor_file+"`",
+                        "Project root is determined by searching for ",
+                        root_files.map(s => '`'+s+'`').join(', '),
                         '.',
                     ].filter(Boolean).join('')
                 ),
@@ -95,26 +102,22 @@ function assert_can_be_missing({can_be_missing, paths_found, input, project_root
     );
 }
 
-function find_project_root({cwd, anchor_file}) {
+function find_project_root({cwd, root_files}) {
     assert_internal(cwd);
 
-    const file_at_root = (() => {
-        const anchor_path = !anchor_file ? null : find_up(anchor_file, {cwd});
-        assert_internal(anchor_path===null || anchor_path.startsWith('/'));
-        if( anchor_path ) {
-            return anchor_path;
-        }
+    const file_at_root = (
+        root_files
+        .map(root_file => {
+            const file_path = !root_files ? null : find_up(root_files, {cwd});
+            assert_internal(file_path===null || file_path.startsWith('/'));
+            return file_path;
+        })
+        .filter(Boolean)
+        .sort(cwd_distance_sorter(cwd))
+        [0]
+    );
 
-        const dot_git_path = find_up('.git', {cwd});
-        assert_internal(dot_git_path===null || dot_git_path.startsWith('/'));
-        if( dot_git_path ) {
-            return dot_git_path;
-        }
-
-        return null;
-    })();
-
-    assert_internal(file_at_root===null || file_at_root.startsWith('/'));
+    assert_internal(file_at_root===undefined || file_at_root.startsWith('/'));
     if( ! file_at_root ) {
         return null;
     }
@@ -188,6 +191,14 @@ function get_gitignore_content({cwd}) {
     } catch(e) {}
 
     return gitignore_content;
+}
+
+function cwd_distance_sorter(cwd) {
+    return (
+        (file1, file2) => {
+            return get_distance_with_cwd(file1, cwd) - get_distance_with_cwd(file2, cwd);
+        }
+    );
 }
 
 function get_distance_with_cwd(path, cwd) {
