@@ -3,7 +3,7 @@ const assert_usage = assert;
 const assert_internal = assert;
 const assert_not_implemented = assert;
 const find_up_module = require('find-up');
-const glob = require('glob');
+//const glob = require('glob');
 const path_module = require('path');
 const is_child_directory = require("path-is-inside");
 const fs = require('fs');
@@ -135,7 +135,7 @@ function find_up(filename, {only_dir, no_dir, cwd}) {
     assert_not_implemented(!no_dir);
     */
 
-    const found_path = find_up_module.sync(filename);
+    const found_path = find_up_module.sync(filename, {cwd});
 
     assert_internal(found_path===null || found_path.constructor===String && found_path.startsWith('/'));
 
