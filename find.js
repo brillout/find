@@ -19,15 +19,13 @@ function find(
     {
       noDir: no_dir = false,
       onlyDir: only_dir = input && input.endsWith('/'),
-      anchorFile,
-      anchorFiles,
+      anchorFiles: anchor_files,
       canBeMissing: can_be_missing = false,
       cwd = process.cwd(),
     }={}
 ) {
     assert_usage(input);
 
-    let anchor_files = anchorFiles || anchorFile;
     anchor_files = !anchor_files && ['.git'] || anchor_files.constructor===Array && anchor_files || [anchor_files];
 
     const filename = input.replace(/\/*$/, '');
