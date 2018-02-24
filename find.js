@@ -41,18 +41,16 @@ function find_file({filename, input, no_dir, only_dir, anchor_files, can_be_miss
 
     const project_root = find_project_root({cwd, anchor_files});
 
-    const path_found_up = find_up(filename, {cwd, no_dir, only_dir});
+    const paths_found__up = ! project_root && find_up(filename, {cwd, no_dir, only_dir});
 
-    const paths_found__down = project_root && (
-        find_down(filename, {cwd: project_root, no_dir, only_dir})
-    );
+    const paths_found__down = project_root && find_down(filename, {cwd: project_root, no_dir, only_dir});
 
     const paths_found = [
         ...(
-            ! path_found_up ? [] : [path_found_up]
+            ! paths_found__up ? [] : [paths_found__up]
         ),
         ...(
-            ! project_root ? [] : paths_found__down
+            ! paths_found__down ? [] : paths_found__down
         ),
     ];
     assert_internal(paths_found.every(path_found => path_found.startsWith('/')));
