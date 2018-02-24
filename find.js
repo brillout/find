@@ -19,34 +19,29 @@ function find(
     {
       noDir: no_dir = false,
       onlyDir: only_dir = input && input.endsWith('/'),
-      anchorFile: anchor_file = null,
+      anchorFile,
+      anchorFiles,
       canBeMissing: can_be_missing = false,
       cwd = process.cwd(),
     }={}
 ) {
     assert_usage(input);
 
+    let anchor_files = anchorFiles || anchorFile;
+    anchor_files = !anchor_files && ['.git'] || anchor_files.constructor===Array && anchor_files || [anchor_files];
+
     const filename = input.replace(/\/*$/, '');
     assert_usage(!filename.includes('/'));
 
     assert_usage(!no_dir || !only_dir);
 
-    const root_files = [
-        ...(
-            !anchor_file && [] ||
-            anchor_file.constructor===Array && anchor_file ||
-            [anchor_file]
-        ),
-        '.git',
-    ];
-
-    return find_file({filename, input, no_dir, only_dir, root_files, can_be_missing, cwd});
+    return find_file({filename, input, no_dir, only_dir, anchor_files, can_be_missing, cwd});
 }
 
-function find_file({filename, input, no_dir, only_dir, root_files, can_be_missing, cwd}) {
+function find_file({filename, input, no_dir, only_dir, anchor_files, can_be_missing, cwd}) {
     assert_internal(!filename.endsWith('/'));
 
-    const project_root = find_project_root({cwd, root_files});
+    const project_root = find_project_root({cwd, anchor_files});
 
     const path_found_up = find_up(filename, {cwd, no_dir, only_dir});
 
@@ -64,7 +59,7 @@ function find_file({filename, input, no_dir, only_dir, root_files, can_be_missin
     ];
     assert_internal(paths_found.every(path_found => path_found.startsWith('/')));
 
-    assert_can_be_missing({can_be_missing, paths_found, input, project_root, root_files});
+    assert_can_be_missing({can_be_missing, paths_found, input, project_root, anchor_files});
 
     if( paths_found.length===0 ) {
         return null;
@@ -82,7 +77,7 @@ function find_file({filename, input, no_dir, only_dir, root_files, can_be_missin
     return found;
 }
 
-function assert_can_be_missing({can_be_missing, paths_found, input, project_root, root_files}) {
+function assert_can_be_missing({can_be_missing, paths_found, input, project_root, anchor_files}) {
     assert_usage(
         can_be_missing || paths_found.length>0,
         ...(
@@ -93,7 +88,7 @@ function assert_can_be_missing({can_be_missing, paths_found, input, project_root
                 ! project_root && (
                     [
                         "Project root is determined by searching for ",
-                        root_files.map(s => '`'+s+'`').join(', '),
+                        anchor_files.map(s => '`'+s+'`').join(', '),
                         '.',
                     ].filter(Boolean).join('')
                 ),
@@ -102,13 +97,13 @@ function assert_can_be_missing({can_be_missing, paths_found, input, project_root
     );
 }
 
-function find_project_root({cwd, root_files}) {
+function find_project_root({cwd, anchor_files}) {
     assert_internal(cwd);
 
     const file_at_root = (
-        root_files
+        anchor_files
         .map(root_file => {
-            const file_path = !root_files ? null : find_up(root_files, {cwd});
+            const file_path = !anchor_files ? null : find_up(anchor_files, {cwd});
             assert_internal(file_path===null || file_path.startsWith('/'));
             return file_path;
         })

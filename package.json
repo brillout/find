@@ -1,6 +1,6 @@
 {
   "name": "@brillout/find",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "main": "./find.js",
   "scripts": {
     "docs": "./node_modules/.bin/mdocs",
