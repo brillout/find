@@ -5,7 +5,6 @@ const assert_not_implemented = assert;
 const find_up_module = require('find-up');
 //const glob = require('glob');
 const path_module = require('path');
-const is_child_directory = require("path-is-inside");
 const fs = require('fs');
 const ignore_module = require('ignore');
 const glob_gitignore = require('glob-gitignore');

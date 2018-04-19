@@ -1,6 +1,6 @@
 {
   "name": "@brillout/find",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "main": "./find.js",
   "scripts": {
     "docs": "./node_modules/.bin/mdocs",
@@ -11,7 +11,6 @@
     "glob": "^7.1.2",
     "glob-gitignore": "^1.0.6",
     "ignore": "^3.3.7",
-    "path-is-inside": "^1.0.2",
     "reassert": "^1.1.0"
   },
   "devDependencies": {
